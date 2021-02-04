@@ -4,9 +4,16 @@
         <link>xss4755.github.io/</link>
         <description>没事发发牢骚、聊聊人生，写写代码审计、工具开发的笔记。</description>
         <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>xss4755@gmail.com (龙小羽)</managingEditor>
-            <webMaster>xss4755@gmail.com (龙小羽)</webMaster><lastBuildDate>Thu, 04 Feb 2021 13:36:55 &#43;0800</lastBuildDate>
+            <webMaster>xss4755@gmail.com (龙小羽)</webMaster><lastBuildDate>Thu, 04 Feb 2021 15:12:55 &#43;0800</lastBuildDate>
             <atom:link href="xss4755.github.io/index.xml" rel="self" type="application/rss+xml" />
         <item>
+    <title>使用hugo搭建github个人博客</title>
+    <link>xss4755.github.io/posts/%E4%BD%BF%E7%94%A8hugo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</link>
+    <pubDate>Thu, 04 Feb 2021 15:12:55 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>xss4755.github.io/posts/%E4%BD%BF%E7%94%A8hugo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</guid>
+    <description><![CDATA[使用hugo静态网站生成器，选择LoveIt主题，将博客搭建搭建到github上。 1、本地安装hugo 本机系统macOS11.1，需要提前安]]></description>
+</item><item>
     <title>markdown入门学习笔记</title>
     <link>xss4755.github.io/posts/markdown%E5%85%A5%E9%97%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</link>
     <pubDate>Thu, 04 Feb 2021 13:36:55 &#43;0800</pubDate>
