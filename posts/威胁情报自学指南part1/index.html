@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>【翻译】威胁情报自学指南Part1 - 龙小羽的博客</title><meta name="Description" content="没事发发牢骚、聊聊人生，写写代码审计、工具开发的笔记。"><meta property="og:title" content="【翻译】威胁情报自学指南Part1" />
+<meta property="og:description" content="翻译：龙小羽@白帽一百 校对：无 首发于“白帽100安全攻防实验室”公众号 前言 学习的方式有很多种。虽然有些人喜欢在现场听老师讲课，但也有一些人更" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/posts/%E5%A8%81%E8%83%81%E6%83%85%E6%8A%A5%E8%87%AA%E5%AD%A6%E6%8C%87%E5%8D%97part1/" />
+<meta property="og:image" content="/logo.png"/>
+<meta property="article:published_time" content="2021-02-24T17:36:55+08:00" />
+<meta property="article:modified_time" content="2021-02-24T17:36:55+08:00" />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="/logo.png"/>
+
+<meta name="twitter:title" content="【翻译】威胁情报自学指南Part1"/>
+<meta name="twitter:description" content="翻译：龙小羽@白帽一百 校对：无 首发于“白帽100安全攻防实验室”公众号 前言 学习的方式有很多种。虽然有些人喜欢在现场听老师讲课，但也有一些人更"/>
+<meta name="application-name" content="龙小羽的博客">
+<meta name="apple-mobile-web-app-title" content="龙小羽的博客"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="/posts/%E5%A8%81%E8%83%81%E6%83%85%E6%8A%A5%E8%87%AA%E5%AD%A6%E6%8C%87%E5%8D%97part1/" /><link rel="prev" href="/posts/%E4%BD%BF%E7%94%A8hugo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "【翻译】威胁情报自学指南Part1",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "\/posts\/%E5%A8%81%E8%83%81%E6%83%85%E6%8A%A5%E8%87%AA%E5%AD%A6%E6%8C%87%E5%8D%97part1\/"
+        },"genre": "posts","wordcount":  4867 ,
+        "url": "\/posts\/%E5%A8%81%E8%83%81%E6%83%85%E6%8A%A5%E8%87%AA%E5%AD%A6%E6%8C%87%E5%8D%97part1\/","datePublished": "2021-02-24T17:36:55+08:00","dateModified": "2021-02-24T17:36:55+08:00","publisher": {
+            "@type": "Organization",
+            "name": "龙小羽"},"author": {
+                "@type": "Person",
+                "name": "龙小羽"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="龙小羽的博客"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://s3.ax1x.com/2021/02/04/y1tv9I.jpg"
+        data-srcset="https://s3.ax1x.com/2021/02/04/y1tv9I.jpg, https://s3.ax1x.com/2021/02/04/y1tv9I.jpg 1.5x, https://s3.ax1x.com/2021/02/04/y1tv9I.jpg 2x"
+        data-sizes="auto"
+        alt="https://s3.ax1x.com/2021/02/04/y1tv9I.jpg"
+        title="https://s3.ax1x.com/2021/02/04/y1tv9I.jpg" />龙小羽的博客</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="龙小羽的博客"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://s3.ax1x.com/2021/02/04/y1tv9I.jpg"
+        data-srcset="https://s3.ax1x.com/2021/02/04/y1tv9I.jpg, https://s3.ax1x.com/2021/02/04/y1tv9I.jpg 1.5x, https://s3.ax1x.com/2021/02/04/y1tv9I.jpg 2x"
+        data-sizes="auto"
+        alt="https://s3.ax1x.com/2021/02/04/y1tv9I.jpg"
+        title="https://s3.ax1x.com/2021/02/04/y1tv9I.jpg" />龙小羽的博客</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">目录</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animated flipInX">【翻译】威胁情报自学指南Part1</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>龙小羽</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2021-02-24">2021-02-24</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 4867 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 10 分钟&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  kept="">
+                <div class="details-summary toc-title">
+                    <span>目录</span>
+                    <span><i class="details-icon fas fa-angle-right"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#阅读和观看">阅读和观看</a></li>
+    <li><a href="#要做的事情">要做的事情</a></li>
+    <li><a href="#要思考的问题">要思考的问题</a></li>
+    <li><a href="#可选的付费资源">可选的付费资源</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#阅读和观看-1">阅读和观看</a></li>
+    <li><a href="#要做的事情-1">要做的事情</a></li>
+    <li><a href="#要思考的问题-1">要思考的问题</a></li>
+    <li><a href="#可选的付费资源-1">可选的付费资源</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#阅读和观看-2">阅读和观看</a></li>
+    <li><a href="#要做的事情-2">要做的事情</a></li>
+    <li><a href="#要思考的问题-2">要思考的问题</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#要做的事情-3">要做的事情</a></li>
+    <li><a href="#要思考的问题-3">要思考的问题</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#阅读和观看-3">阅读和观看</a></li>
+    <li><a href="#要做的事情-4">要做的事情</a></li>
+    <li><a href="#要思考的问题-4">要思考的问题</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>翻译：龙小羽@白帽一百</p>
+<p>校对：无</p>
+<p>首发于“白帽100安全攻防实验室”公众号</p>
+<h1 id="前言">前言</h1>
+<p>学习的方式有很多种。虽然有些人喜欢在现场听老师讲课，但也有一些人更擅长自学。我讲的课程是<a href="https://www.sans.org/cyber-security-courses/cyber-threat-intelligence/" target="_blank" rel="noopener noreffer">SANS FOR578：威胁情报</a>，如果你想学习威胁情报(CTI)，这是一门很好的课程，但我知道不是每个人都买得起。</p>
+<p>这里有一个好消息：如果你有决心，你能学到很多在付费课程里才能学到的内容，但是要靠自学。它和付费课程不一样，但如果这种学习方式适合你，你仍然可以学到很多东西。我想分享一个自学计划来帮助所有想要自学CTI的人。虽然有很多很好的资源，但是我知道当你开始学习时，大家说的去看看所有的东西并不是那么有用，因为你并不知道去哪里找资源。我的目标是集中我推荐学习的免费资源，同时提供一个最基本的框架和问题来帮助你解决他们。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://tva1.sinaimg.cn/large/008eGmZEly1gnys6xu4abj31400u0npd.jpg"
+        data-srcset="https://tva1.sinaimg.cn/large/008eGmZEly1gnys6xu4abj31400u0npd.jpg, https://tva1.sinaimg.cn/large/008eGmZEly1gnys6xu4abj31400u0npd.jpg 1.5x, https://tva1.sinaimg.cn/large/008eGmZEly1gnys6xu4abj31400u0npd.jpg 2x"
+        data-sizes="auto"
+        alt="https://tva1.sinaimg.cn/large/008eGmZEly1gnys6xu4abj31400u0npd.jpg"
+        title="Image for post" /></p>
+<p>我的书架！（一部分&hellip;）</p>
+<h1 id="如何使用本计划">如何使用本计划</h1>
+<p>说实话，无论如何他对你都是有帮助的!:)我写这篇文章的想法是，想要学习CTI的人可以逐节学习，因为有些概念是相互关联的。请注意，如果你做这整件事会花费大量的时间和经历。我已经涵盖了需要读和看的资料、要做的事和需要思考的问题，如果你想更深入的学习还有一些可选的付费资料。（请注意一些链接会直接下载PDF）也许你是按照顺序学习的，但也许你只是想更多的学一些特定的内容。我强烈建议你边学习边做笔记来巩固学到的内容，同时认真负责的思考和回答问题——批判性思维是这一切的关键。想要成为一名优秀的CTI分析师，你不能只记住一些东西，你必须思考你对他的看法以及如何应用。在开始之前，考虑一下你想如何记录你的笔记（纸质笔记本，文件夹，google docs，OneNote，或者其他任何适合你的方式）。</p>
+<p>如果你是刚进入这个行业，我建议你在遇到问题的时候找人帮你解决。虽然我很希望我能做到，但是我没有精力去回答问题，但我的建议是——如果你在推特上圈我(@likethecoins)，解释为什么你想通过这份计划自学，为什么你需要一个导师，我会很乐意为你转发，尝试为你联系社区中可以帮你的人。我很幸运有很多做CTI的朋友热心帮助这个行业的新人。</p>
+<p>我会在有时间单独写每一节的时候把这个计划拆开。我还没完全决定未来部分的主题，但这里有几个我计划的主题：tools/TIPs，pivoting，开源研究，评估报告，集群，指标/TTPs，威胁建模，评估/不确定性，和传播/写作。</p>
+<p>第一部分包括：</p>
+<ul>
+<li>情报</li>
+<li>威胁情报</li>
+<li>需求</li>
+<li>威胁情报社区</li>
+<li>框架和模式</li>
+</ul>
+<h1 id="情报">情报</h1>
+<p>CTI代表了两个领域的融合：情报和网络安全。优秀的威胁情报分析师会理解关于情报的基本原理，并将这些原理应用到他们的工作中。有时我看到分析人员很难将“传统情报”和网络安全概念结合起来，所以我建议先学习这一节，多思考如何把情报适用于接下来的一切。</p>
+<h2 id="阅读和观看">阅读和观看</h2>
+<ul>
+<li>阅读有关<a href="https://web.archive.org/web/20201102212401/https://www.cia.gov/library/kent-center-occasional-papers/pdf/OPNo5.pdf" target="_blank" rel="noopener noreffer">《谢尔曼-肯特分析学说》</a>的9条原则，从第9页的 “1. Focus on Policymaker Concerns” 开始（其他的可以略过）。谢尔曼-肯特是一个你应该知道的人，他的这些分析学说原则是我认为的一个情报分析员应该具备的核心内容。</li>
+<li>阅读理查德-豪雅的<a href="https://web.archive.org/web/20201206081245/https://www.cia.gov/library/center-for-the-study-of-intelligence/csi-publications/books-and-monographs/psychology-of-intelligence-analysis/PsychofIntelNew.pdf" target="_blank" rel="noopener noreffer">《情报分析心理学》</a>。这本书很好地介绍了关于我们作为情报分析人员如何思考的几个重要原则&ndash;包括认知偏差和结构化分析技术。</li>
+<li>阅读<a href="https://www.intelligencecareers.gov/icintelligence.html" target="_blank" rel="noopener noreffer">情报循环</a></li>
+</ul>
+<h2 id="要做的事情">要做的事情</h2>
+<ul>
+<li>研究一下谢尔曼-肯特和理查兹-豪雅——为什么他们在这个领域被认为是重要的（特别是在西方情报界）？还有哪些人在情报领域很重要，特别是在非西方的角度？（去研究并至少找到一个）</li>
+<li>逛逛这个<a href="https://yourbias.is/" target="_blank" rel="noopener noreffer">认知偏见网站</a>，去研究认知偏见可以找到一些理查兹-豪雅的《情报分析心理学》中没有的内容。</li>
+<li>识别自己在日常生活中的认知偏见。这很难，但如果你对自己诚实就可以做到。Tips：任何让你生气的事情都是寻找偏见的好地方。当你发现你的认知偏见时写下来。</li>
+</ul>
+<h2 id="要思考的问题">要思考的问题</h2>
+<ul>
+<li>为什么情报分析人员认为谢尔曼-肯特的分析学说如此重要？如果分析人员不遵循这些原则会发生什么？思考一下每个原则的例子。你能想到你见过的人们没有遵循这些原则的情况吗——无论是在情报方面还是在其他地方？发生了什么？</li>
+<li>当你通过这个自学的其余部分时，你什么时候看到分析师坚持谢尔曼-肯特的分析学说？什么时候没有遵守它？结果如何？</li>
+<li>为什么会有情报循环存在？情报与原始数据有何不同？</li>
+</ul>
+<h2 id="可选的付费资源">可选的付费资源</h2>
+<ul>
+<li>如果你想了解更多关于美国情报界的情况，我推荐马克-洛温塔尔的《情报：从秘密到政策》。旧版的几乎一样好，而且便宜得多。这是我在研究生院的情报课上被指定的书，它在高等教育中被广泛使用。</li>
+</ul>
+<h1 id="威胁情报">威胁情报</h1>
+<p>本节主要向你介绍威胁情报的一些基本概念，并了解其历史。</p>
+<h2 id="阅读和观看-1">阅读和观看</h2>
+<ul>
+<li>看我做的 <a href="https://www.youtube.com/watch?v=J7e74QLVxCk" target="_blank" rel="noopener noreffer">YouTube视频</a></li>
+<li>阅读Sergio Caltagirone的<a href="https://www.dragos.com/wp-content/uploads/Industrial-Control-Threat-Intelligence-Whitepaper.pdf" target="_blank" rel="noopener noreffer">这篇论文</a>。不要纠结于ICS特有的术语（如果你想的话，你可以略过这些部分）；把它们当作威胁情报的例子&hellip;&hellip;你读这篇文章的目的不是为了成为ICS专家，而是为了学习威胁情报的一些基本原则。</li>
+<li>观看<a href="https://chrissanders.org/training/cuckoosegg/" target="_blank" rel="noopener noreffer">Chris Sanders的免费的Cuckoo’s Egg课程</a>的第6周视频。（在某些时候，我建议观看整套视频，因为这是克里斯的一个很优秀的免费资源，但对于威胁情报来说第6周才是关键。）这个视频也涵盖了下面很多主题。</li>
+<li>如果你正在创建一个团队/威胁情报项目，请观看我和DomainTools的Jackie Abrams做过的<a href="https://www.sans.org/webcasts/build-robust-cyber-threat-intelligence-program-112505/" target="_blank" rel="noopener noreffer">会议资料</a>。你需要注册一个免费的SANS账号来登录查看录音。我还推荐阅读INSA的<a href="https://www.insaonline.org/wp-content/uploads/2017/04/INSA_Cyber_Intel_PrepTalent.pdf" target="_blank" rel="noopener noreffer">这篇论文</a>，尤其是你正在创建一个团队时。</li>
+<li>阅读威胁情报历史上的一份重要报告：2013年的<a href="https://www.fireeye.com/content/dam/fireeye-www/services/pdfs/mandiant-apt1-report.pdf" target="_blank" rel="noopener noreffer">Mandiant APT1报告</a>。</li>
+</ul>
+<h2 id="要做的事情-1">要做的事情</h2>
+<ul>
+<li>去找几个不同的CTI的定义。这些定义有什么不同？哪一个最能引起你的共鸣？你能找到 &ldquo;威胁情报 &ldquo;这个词最早使用的日期是什么？</li>
+<li>研究 &ldquo;高级持续性威胁 &ldquo;一词的来历。去研究围绕APT1报告的新闻&ndash;为什么这么重要？</li>
+<li>研究并记录至少一个你能找到在2013年之前(APT1报告出来的时候)的重大威胁情报事件或入侵事件。（如果你需要一个开始的地方，请查看<a href="https://www.cfr.org/cyber-operations/" target="_blank" rel="noopener noreffer">这个网站</a>）。你选择的事件/入侵事件有什么值得注意的地方？你能找到在它之后发生的任何类似事件/入侵（例如，涉及类似的行为者或TTPs）吗？</li>
+</ul>
+<h2 id="要思考的问题-1">要思考的问题</h2>
+<ul>
+<li>您从情报部分看到的哪些原则也适用于威胁情报？你认为威胁情报与传统情报有什么相同或不同？</li>
+<li>威胁情报作为一门学科已经存在多久了？在你学习本课程时，请思考你认为谁是推动威胁情报发展的关键人物和组织。</li>
+<li>传统的情报循环如何转化为威胁情报？</li>
+</ul>
+<h2 id="可选的付费资源-1">可选的付费资源</h2>
+<ul>
+<li>如果你正在寻找一本关于威胁情报的好书，我强烈推荐Rebekah Brown和Scott Roberts的<a href="https://www.oreilly.com/library/view/intelligence-driven-incident-response/9781491935187/" target="_blank" rel="noopener noreffer">《情报驱动的事件响应》</a></li>
+<li>如果你正在寻找付费的威胁情报课程，我推荐<a href="https://www.sans.org/cyber-security-courses/cyber-threat-intelligence/" target="_blank" rel="noopener noreffer">SANS FOR578</a>（完全公开：我教它！），Joe Slowik的<a href="https://paralus.co/training/" target="_blank" rel="noopener noreffer">运营威胁情报课程</a>，或者<a href="https://school.threatintel.academy/" target="_blank" rel="noopener noreffer">Sergio Caltagirone的任何课程</a>。<a href="https://chrissanders.org/training/investigationtheory/" target="_blank" rel="noopener noreffer">Chris Sanders的调查理论课程</a>更多的是基于法医，但他所教授的原则是你作为威胁情报分析师应该掌握的关键内容。</li>
+</ul>
+<h1 id="需求">需求</h1>
+<p>这些内容非常重要，所以它们有自己单独的章节，虽然其中一些内容在上面的威胁情报中有所涉及。</p>
+<h2 id="阅读和观看-2">阅读和观看</h2>
+<ul>
+<li>阅读<a href="https://sroberts.medium.com/cti-squadgoals-setting-requirements-41bcb63db918" target="_blank" rel="noopener noreffer">Scott Roberts关于需求的博客文章</a>。</li>
+<li>观看Andreas Sfakianakis的<a href="https://www.youtube.com/watch?v=kGqnCR6XOhQ" target="_blank" rel="noopener noreffer">2020年威胁情报峰会演讲</a>。</li>
+<li>阅读<a href="https://isc.sans.edu/forums/diary/Defining&#43;Threat&#43;Intelligence&#43;Requirements/21519/" target="_blank" rel="noopener noreffer">Pasquale Stirparo的博客文章</a>。</li>
+</ul>
+<h2 id="要做的事情-2">要做的事情</h2>
+<ul>
+<li>选择一个组织中的威胁情报团队——你可以想象一个，也可以使用你所知道的一个真实的团队（如果你想在一家公司找一份威胁情报工作，选择那个组织就很适合这个练习）。根据你对该公司的研究（或编造的信息），写下你认为他们可能有的战略、行动和战术情报要求。</li>
+</ul>
+<h2 id="要思考的问题-2">要思考的问题</h2>
+<ul>
+<li>为什么需求在威胁情报中如此重要？如果一个团队没有需求，你认为会发生什么？</li>
+</ul>
+<h1 id="威胁情报社区">威胁情报社区</h1>
+<p>如果你想参与威胁情报，了解社区很重要，包括其中的关键人物和利益相关者。就像生活中的任何事情一样，每个人都有不同的观点、背景和动机。你应该了解社区中的人，同时也要意识到我们都有自己的认知偏见(看到这是在前面的材料基础上建立起来的吗?)，所以你应该始终批判性地思考别人提出的观点&ndash;以及你是否同意或不同意(始终以尊重的方式进行，而不是诉诸于攻击)。</p>
+<h2 id="要做的事情-3">要做的事情</h2>
+<ul>
+<li>创建一个Twitter账号（不一定要用你的真名），然后去CTI里找人关注。如果你不确定要关注谁，可以看看我（@likethecoins），看看我转发和互动的人，或者关注一些我在这篇文章中提到的人。从你的Twitter研究中，找出CTI社区使用的标签。关注这些标签&ndash;你可能会发现使用<a href="https://help.twitter.com/en/using-twitter/how-to-use-tweetdeck" target="_blank" rel="noopener noreffer">TweetDeck</a>来做这件事更容易。</li>
+<li>创建一个你看到的那些Twitter用户们共享的一些资源的RSS源。你可以使用Feedly的免费产品来做这件事，或者<a href="https://zapier.com/blog/best-rss-feed-reader-apps/" target="_blank" rel="noopener noreffer">其他许多免费的RSS源选项</a>。建立一个好的RSS源对于许多威胁情报角色来说是必不可少的，因为它可以让你及时了解新的博客文章和报告。请记住，你的RSS提要会随着时间的推移，根据你发现的新来源和你的需求（必要！！！）而成长和改变，所以不要担心开始时它是否 &ldquo;完美&rdquo;。</li>
+</ul>
+<h2 id="要思考的问题-3">要思考的问题</h2>
+<ul>
+<li>哪些人和公司组成了 &ldquo;威胁情报社区&rdquo;？(例如，供应商是一个群体——其他群体是什么？) &ldquo;威胁情报社区 &ldquo;与网络安全社区的其他部分（如 DFIR）如何重叠？</li>
+<li>威胁情报分析师和威胁情报公司在社会上扮演什么角色？他们的背景是什么，他们做什么？他们是否有特定的角度或议程？媒体在威胁情报社区中扮演什么角色？</li>
+<li>分析师们在Twitter上讨论威胁情报的什么？谁似乎代表了什么观点？他们的背景是什么会导致他们有这些观点？</li>
+<li>威胁情报社区有哪些重要活动和会议？哪些是免费的，费用是多少？不同的活动采取什么方式/角度？</li>
+</ul>
+<h1 id="框架和模式">框架和模式</h1>
+<p>我建议你了解的 &ldquo;三大 &ldquo;框架和模型是Cyber Kill Chain、Diamond Model和MITRE ATT&amp;CK(R)，不过还有其他几种。对于威胁情报分析师来说，了解这些框架和模型是什么，如何应用这些框架和模型，以及在应用这些框架和模型时需要注意什么是非常重要的。这些框架和模型中的概念也将贯穿在本自学计划中。</p>
+<h2 id="阅读和观看-3">阅读和观看</h2>
+<ul>
+<li>阅读Chris Sanders<a href="https://chrissanders.org/2019/05/infosec-mental-models/" target="_blank" rel="noopener noreffer">关于神经模型的博客</a>。</li>
+<li>阅读洛克希德-马丁公司网络杀伤链(R)的<a href="https://www.lockheedmartin.com/content/dam/lockheed-martin/rms/documents/cyber/LM-White-Paper-Intel-Driven-Defense.pdf" target="_blank" rel="noopener noreffer">论文</a></li>
+<li>如果你是 &ldquo;星球大战 &ldquo;的粉丝，请阅读ThreatConnect关于<a href="https://threatconnect.com/blog/diamond-model-threat-intelligence-star-wars/" target="_blank" rel="noopener noreffer">将 &ldquo;星球大战 &ldquo;应用于钻石模型的博客</a>。（如果你不是星战迷，你显然也可以阅读，只是对你来说可能没有那么大的意义！）</li>
+<li>阅读<a href="https://www.activeresponse.org/wp-content/uploads/2013/07/diamond.pdf" target="_blank" rel="noopener noreffer">钻石模型的论文</a>。它的内容很多，但很厉害，所以如果你需要的话，可以把它分成几部分看。</li>
+<li>访问<a href="http://veriscommunity.net/" target="_blank" rel="noopener noreffer">VERIS网站</a>，浏览各个部分——可能是 &ldquo;快速入门 &ldquo;部分、或任何有助于您了解VERIS是什么、以及为什么你会使用它的部分。</li>
+</ul>
+<h2 id="要做的事情-4">要做的事情</h2>
+<ul>
+<li>参加我和前队友Adam Pennington一起创建的<a href="https://attack.mitre.org/resources/training/cti/" target="_blank" rel="noopener noreffer">ATT&amp;CK for CTI培训</a>，设计时间约为4小时。(请注意，它是基于以前版本的ATT&amp;CK，但你仍然会学到关键的内容。)</li>
+<li>找出至少一个团队（可能是网络安全供应商）应用上述每个框架或模式的例子。思考你对他们如何应用的利弊的看法。</li>
+<li>去寻找使用了两个或多个这些框架的例子。(提示：Palo Alto的Unit 42团队有一个很好的例子，尽管还有其他的例子！)</li>
+</ul>
+<h2 id="要思考的问题-4">要思考的问题</h2>
+<ul>
+<li>为什么威胁情报分析人员要使用框架和模型？这些框架或模型在什么时候会有用？</li>
+<li>框架和模型的局限性是什么？使用这些框架和模型有什么风险？</li>
+</ul>
+<h1 id="最后">最后</h1>
+<p>我希望你觉得这自学计划的第一部分有用！如果你对你最想看到的主题有要求，请告诉我，我可以用它来帮助确定下一步工作的优先次序。</p>
+<p>原文地址：https://medium.com/katies-five-cents/a-cyber-threat-intelligence-self-study-plan-part-1-968b5a8daf9a</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2021-02-24</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/%E4%BD%BF%E7%94%A8hugo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" class="prev" rel="prev" title="使用hugo搭建github个人博客"><i class="fas fa-angle-left fa-fw"></i>使用hugo搭建github个人博客</a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.80.0">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2021</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">龙小羽</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>
