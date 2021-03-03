@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>java代码审计基础01——类加载机制 - 龙小羽的博客</title><meta name="Description" content="没事发发牢骚、聊聊人生，写写代码审计、工具开发的笔记。"><meta property="og:title" content="java代码审计基础01——类加载机制" />
+<meta property="og:description" content="类加载过程是指java虚拟机把.class文件中类信息加载进内存，并进行解析生成对应的class对象的过程。 过程如下图。 需要说明得是，JVM" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/posts/java%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%E5%9F%BA%E7%A1%8001/" />
+<meta property="og:image" content="/logo.png"/>
+<meta property="article:published_time" content="2021-03-03T16:30:55+08:00" />
+<meta property="article:modified_time" content="2021-03-03T16:30:55+08:00" />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="/logo.png"/>
+
+<meta name="twitter:title" content="java代码审计基础01——类加载机制"/>
+<meta name="twitter:description" content="类加载过程是指java虚拟机把.class文件中类信息加载进内存，并进行解析生成对应的class对象的过程。 过程如下图。 需要说明得是，JVM"/>
+<meta name="application-name" content="龙小羽的博客">
+<meta name="apple-mobile-web-app-title" content="龙小羽的博客"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="/posts/java%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%E5%9F%BA%E7%A1%8001/" /><link rel="prev" href="/posts/%E5%A8%81%E8%83%81%E6%83%85%E6%8A%A5%E8%87%AA%E5%AD%A6%E6%8C%87%E5%8D%97part1/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "java代码审计基础01——类加载机制",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "\/posts\/java%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%E5%9F%BA%E7%A1%8001\/"
+        },"genre": "posts","wordcount":  2642 ,
+        "url": "\/posts\/java%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%E5%9F%BA%E7%A1%8001\/","datePublished": "2021-03-03T16:30:55+08:00","dateModified": "2021-03-03T16:30:55+08:00","publisher": {
+            "@type": "Organization",
+            "name": "龙小羽"},"author": {
+                "@type": "Person",
+                "name": "龙小羽"
+            },"description": ""
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="龙小羽的博客"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://s3.ax1x.com/2021/02/04/y1tv9I.jpg"
+        data-srcset="https://s3.ax1x.com/2021/02/04/y1tv9I.jpg, https://s3.ax1x.com/2021/02/04/y1tv9I.jpg 1.5x, https://s3.ax1x.com/2021/02/04/y1tv9I.jpg 2x"
+        data-sizes="auto"
+        alt="https://s3.ax1x.com/2021/02/04/y1tv9I.jpg"
+        title="https://s3.ax1x.com/2021/02/04/y1tv9I.jpg" />龙小羽的博客</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="龙小羽的博客"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://s3.ax1x.com/2021/02/04/y1tv9I.jpg"
+        data-srcset="https://s3.ax1x.com/2021/02/04/y1tv9I.jpg, https://s3.ax1x.com/2021/02/04/y1tv9I.jpg 1.5x, https://s3.ax1x.com/2021/02/04/y1tv9I.jpg 2x"
+        data-sizes="auto"
+        alt="https://s3.ax1x.com/2021/02/04/y1tv9I.jpg"
+        title="https://s3.ax1x.com/2021/02/04/y1tv9I.jpg" />龙小羽的博客</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">目录</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animated flipInX">java代码审计基础01——类加载机制</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>龙小羽</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2021-03-03">2021-03-03</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 2642 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 6 分钟&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  kept="">
+                <div class="details-summary toc-title">
+                    <span>目录</span>
+                    <span><i class="details-icon fas fa-angle-right"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#类加载机制双亲委派模型">类加载机制：双亲委派模型</a></li>
+    <li><a href="#第三方包加载方式反向委派机制">第三方包加载方式：反向委派机制</a></li>
+    <li><a href="#类加载器的分类">类加载器的分类</a>
+      <ul>
+        <li><a href="#启动类加载器bootstrap-class-loader">启动类加载器（bootstrap class loader）</a></li>
+        <li><a href="#扩展类加载器extension-class-loader">扩展类加载器（extension class loader）</a></li>
+        <li><a href="#应用类加载器application-class-loader">应用类加载器(application class loader)</a></li>
+        <li><a href="#自定义类加载器">自定义类加载器</a></li>
+      </ul>
+    </li>
+    <li><a href="#作用">作用</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#验证">验证</a></li>
+    <li><a href="#准备">准备</a></li>
+    <li><a href="#解析非必须">解析（非必须）</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#类的初始化被触发的情况">类的初始化被触发的情况</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>类加载过程是指java虚拟机把.class文件中类信息加载进内存，并进行解析生成对应的class对象的过程。</p>
+<p>过程如下图。</p>
+<blockquote>
+<p>需要说明得是，JVM并不是一开始就把所有得类都加载进内存，而是遇到哪个类，发现内存中没有这个类的class信息，再去加载，且只加载一次（类初始化是线程安全的）。</p>
+</blockquote>
+<blockquote>
+<p>类的初始化仅会被执行一次，这个特性被用来实现单例的延迟初始化。</p>
+</blockquote>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://tva1.sinaimg.cn/large/e6c9d24ely1go6srerq5aj20gz07xdga.jpg"
+        data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1go6srerq5aj20gz07xdga.jpg, https://tva1.sinaimg.cn/large/e6c9d24ely1go6srerq5aj20gz07xdga.jpg 1.5x, https://tva1.sinaimg.cn/large/e6c9d24ely1go6srerq5aj20gz07xdga.jpg 2x"
+        data-sizes="auto"
+        alt="https://tva1.sinaimg.cn/large/e6c9d24ely1go6srerq5aj20gz07xdga.jpg"
+        title="Untitled" /></p>
+<h1 id="基础信息">基础信息</h1>
+<p>class文件——&gt;内存中的类【没有初始化也不能用】</p>
+<p>java类型</p>
+<ul>
+<li>基本类型【java虚拟机预先定义好】</li>
+<li>引用类型
+<ul>
+<li>类(对应字节流)</li>
+<li>接口(对应字节流)</li>
+<li>数组类(java虚拟机直接生成)</li>
+<li>泛型参数(编译过程中会被擦除，java虚拟机中不存在)</li>
+</ul>
+</li>
+</ul>
+<p>字节流</p>
+<ul>
+<li>java编译器生成的class文件</li>
+<li>程序内部直接生成</li>
+<li>网络中获取 eg：网页中内嵌的小程序java applet</li>
+</ul>
+<h1 id="类的生命周期">类的生命周期</h1>
+<p>加载——链接——初始化——使用——卸载</p>
+<p>类加载过程包含其中的加载、链接、初始化。（使用是指new对象，卸载是指对象被垃圾回收）</p>
+<h1 id="第一步加载">第一步：加载</h1>
+<p>加载——<strong>查找字节流，并且据此创建类的过程</strong></p>
+<p>数组类——没有对应字节流，由java虚拟机直接生成</p>
+<p>其他的类——java虚拟机需要借助<strong>类加载器</strong>来完成<strong>查找字节流的过程</strong></p>
+<blockquote>
+<p>类比盖房子，先找建筑师，设计一个房型，比如“一室、一厅、一卫”。房型=类，建筑师=类加载器</p>
+</blockquote>
+<blockquote>
+<p>启动类加载器（bootstrap class loader）= 建筑师的祖师爷</p>
+</blockquote>
+<blockquote>
+<p>启动类加载器由C++实现，没有对应的java对象。</p>
+</blockquote>
+<p>除了启动类加载器之外，其他的类加载器都是java.lang.ClassLoader的子类，有对应的java对象。</p>
+<p>这些类加载器需要先由另一个类加载器(eg:启动类加载器)加载至java虚拟机中，方能执行类加载。</p>
+<h2 id="类加载机制双亲委派模型">类加载机制：双亲委派模型</h2>
+<p>每一个类加载器接收到加载请求时，先将请求转发给父类加载器。当父类加载器没有找到所请求的类的情况下，该类加载器才会尝试去加载。</p>
+<blockquote>
+<p>eg：村里的建筑师有一个潜规则，就是接到单子自己不能着手干，得先给师傅过过目。师傅不接手的情况下，才能自己来。</p>
+</blockquote>
+<h2 id="第三方包加载方式反向委派机制">第三方包加载方式：反向委派机制</h2>
+<p>在Java应用中存在着很多服务提供者接口（Service Provider Interface，SPI），这些接口允许第三方为它们提供实现，如常见的 SPI 有 JDBC、JNDI等，这些 SPI 的接口属于 Java 核心库，一般存在rt.jar包中，由Bootstrap类加载器加载。而Bootstrap类加载器无法直接加载SPI的实现类，同时由于双亲委派模式的存在，Bootstrap类加载器也无法反向委托AppClassLoader加载器SPI的实现类。在这种情况下，我们就需要一种特殊的类加载器来加载第三方的类库，而<strong>线程上下文类加载器</strong>（双亲委派模型的破坏者）就是很好的选择。</p>
+<p>从图可知rt.jar核心包是有Bootstrap类加载器加载的，其内包含SPI核心接口类，由于SPI中的类经常需要调用外部实现类的方法，而jdbc.jar包含外部实现类(jdbc.jar存在于classpath路径)无法通过Bootstrap类加载器加载，因此只能委派线程上下文类加载器把jdbc.jar中的实现类加载到内存以便SPI相关类使用。显然这种线程上下文类加载器的加载方式破坏了“双亲委派模型”，它在执行过程中抛弃双亲委派加载链模式，使程序可以逆向使用类加载器，当然这也使得Java类加载器变得更加灵活。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://tva1.sinaimg.cn/large/e6c9d24ely1go6sskfk0oj20h90btwex.jpg"
+        data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1go6sskfk0oj20h90btwex.jpg, https://tva1.sinaimg.cn/large/e6c9d24ely1go6sskfk0oj20h90btwex.jpg 1.5x, https://tva1.sinaimg.cn/large/e6c9d24ely1go6sskfk0oj20h90btwex.jpg 2x"
+        data-sizes="auto"
+        alt="https://tva1.sinaimg.cn/large/e6c9d24ely1go6sskfk0oj20h90btwex.jpg"
+        title="https://tva1.sinaimg.cn/large/e6c9d24ely1go6sskfk0oj20h90btwex.jpg" /></p>
+<h2 id="类加载器的分类">类加载器的分类</h2>
+<h3 id="启动类加载器bootstrap-class-loader">启动类加载器（bootstrap class loader）</h3>
+<p>负责加载最为基础、最为重要的类，存放在JRE的lib目录下的jar包中的类，以及由虚拟机参数 -Xbootclasspath制定的类。</p>
+<h3 id="扩展类加载器extension-class-loader">扩展类加载器（extension class loader）</h3>
+<p>是启动类加载器的子类。</p>
+<p>负责加载相对次要、但又通用的类，比如存放在lib/ext目录下jar包中的类，以及由系统变量java.ext.dirs制定的类。</p>
+<h3 id="应用类加载器application-class-loader">应用类加载器(application class loader)</h3>
+<p>是扩展类加载器的子类。</p>
+<p>负责加载应用程序路径下的类（这里的路径是，虚拟机参数-cp/-classpath、系统变量java.class.path或环境变量CLASSPATH所指定的路径）</p>
+<p>默认情况下，应用程序中包含的类是由应用类加载器加载的。</p>
+<h3 id="自定义类加载器">自定义类加载器</h3>
+<p>加入自定义的类加载器，可以实现特殊的加载方式。</p>
+<p>eg：对class文件加密，加载时利用自定义的类加载器对其解密。</p>
+<h2 id="作用">作用</h2>
+<p>加载功能</p>
+<p>命名空间</p>
+<p>类的唯一性由类加载器实例及类的全名一起确定。</p>
+<p>同一串字节流，经由不同的类加载器加载，也会得到两个不同的类。</p>
+<p>大型项目中，借助这一特性来运行同一个类的不同版本。</p>
+<h1 id="第二步链接">第二步：链接</h1>
+<p>链接——将创建成的类合并至java虚拟机中，使其可以执行。</p>
+<p>过程包含验证、准备、解析。</p>
+<h2 id="验证">验证</h2>
+<p>确保被加载类能够满足java虚拟机的约束条件。</p>
+<h2 id="准备">准备</h2>
+<p>为加载类的静态字段分配内存。</p>
+<p>部分虚拟机会构造其他跟类层次相关的数据结构，eg:用来实现虚方法的动态绑定的方法表。</p>
+<p>在 class 文件被加载至 Java 虚拟机之前，这个类无法知道其他类及其方法、字段所对应的具体地址，甚至不知道自己方法、字段的地址。因此，每当需要引用这些成员时，Java 编译器会生成一个符号引用。</p>
+<h2 id="解析非必须">解析（非必须）</h2>
+<p>将符号引用解析成实际引用。</p>
+<p>如果符号引用指向一个未被加载的类，或者未被加载的字段、方法，那么解析触发这个类的加载（未必触发这个类的链接、初始化）</p>
+<blockquote>
+<p>Java 虚拟机规范并没有要求在链接过程中完成解析。它仅规定了：如果某些字节码使用了符号引用，那么在执行这些字节码之前，需要完成对这些符号引用的解析。</p>
+</blockquote>
+<h1 id="第三步初始化">第三步：初始化</h1>
+<p>初始化——为标记为常量值的字段赋值，以及执行 &lt; clinit &gt; 方法的过程。</p>
+<blockquote>
+<p>Java 虚拟机会通过加锁来确保类的 &lt; clinit &gt; 方法仅被执行一次。</p>
+</blockquote>
+<p>java中初始化一个静态字段</p>
+<ul>
+<li>声明时直接赋值静态代码块中对其赋值‘</li>
+<li>final修饰 &amp; 类型为基本类型或字符串——&gt;会被java编译器标记成常量，由java虚拟机完成初始化除此之外的直接赋值和所有的静态代码块中的代码，会被java编译器放于同一方法中<!-- raw HTML omitted --></li>
+</ul>
+<h2 id="类的初始化被触发的情况">类的初始化被触发的情况</h2>
+<ul>
+<li>当虚拟机启动时，初始化用户指定的主类；</li>
+<li>当遇到用以新建目标类实例的 new 指令时，初始化 new 指令的目标类；</li>
+<li>当遇到调用静态方法的指令时，初始化该静态方法所在的类；</li>
+<li>当遇到访问静态字段的指令时，初始化该静态字段所在的类；</li>
+<li>子类的初始化会触发父类的初始化；</li>
+<li>如果一个接口定义了 default 方法，那么直接实现或者间接实现该接口的类的初始化，会触发该接口的初始化；</li>
+<li>使用反射 API 对某个类进行反射调用时，初始化这个类；</li>
+<li>当初次调用 MethodHandle 实例时，初始化该 MethodHandle 指向的方法所在的类。</li>
+</ul>
+<p>参考资料：</p>
+<p><a href="https://time.geekbang.org/column/article/11523">https://time.geekbang.org/column/article/11523</a></p>
+<p><a href="https://mp.weixin.qq.com/s/49vLz5K3hFt7IH3UByYk7A">https://mp.weixin.qq.com/s/49vLz5K3hFt7IH3UByYk7A</a></p>
+<p><a href="https://xz.aliyun.com/t/9002#toc-0">https://xz.aliyun.com/t/9002#toc-0</a></p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2021-03-03</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/%E5%A8%81%E8%83%81%E6%83%85%E6%8A%A5%E8%87%AA%E5%AD%A6%E6%8C%87%E5%8D%97part1/" class="prev" rel="prev" title="【翻译】威胁情报自学指南Part1"><i class="fas fa-angle-left fa-fw"></i>【翻译】威胁情报自学指南Part1</a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.80.0">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2021</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">龙小羽</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><script type="text/javascript" src="/lib/smooth-scroll/smooth-scroll.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>
